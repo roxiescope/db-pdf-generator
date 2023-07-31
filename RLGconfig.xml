@@ -1,0 +1,109 @@
+<data>
+    <databaseCreds>
+        <database>fictionalUniverse</database>
+        <user>postgres</user>
+        <host>localhost</host>
+        <password>gay</password>
+        <port>5433</port>
+    </databaseCreds>
+    <FontSettings>daredevil<text>
+            <font>Times-Roman</font>
+            
+            <fontSize>10</fontSize>
+            <textColor>0x000000</textColor>
+            <alignment>0</alignment>
+            <spaceAfter>0</spaceAfter>
+            <backColor>0xFFFFFF</backColor>
+            <borderColor>0x000000</borderColor>
+            <borderWidth>0</borderWidth>
+            <borderPadding>0</borderPadding>
+            <textTransform>none</textTransform>
+            <firstLineIndent>0</firstLineIndent>
+        </text>
+        <bullet>
+            <font>Times-Roman</font>
+            
+            <fontSize>10</fontSize>
+            <textColor>0x000000</textColor>
+            <alignment>0</alignment>
+            <spaceAfter>3</spaceAfter>
+            <backColor>0xFFFFFF</backColor>
+            <borderColor>0x000000</borderColor>
+            <borderWidth>0</borderWidth>
+            <borderPadding>0</borderPadding>
+            <textTransform>none</textTransform>
+            <firstLineIndent>0</firstLineIndent>
+            <bulletIndent>3</bulletIndent>
+            <leftIndent>12</leftIndent>
+        </bullet>
+        <heading1>
+            <font>Times-Bold</font>
+            
+            <fontSize>16</fontSize>
+            <textColor>0x000000</textColor>
+            <alignment>0</alignment>
+            <spaceBefore>8</spaceBefore>
+            <spaceAfter>14</spaceAfter>
+            <backColor>0xFFFFFF</backColor>
+            <borderColor>0x000000</borderColor>
+            <borderWidth>0</borderWidth>
+            <borderPadding>0</borderPadding>
+            <textTransform>none</textTransform>
+        </heading1>
+        <heading2>
+            <font>Times-Bold</font>
+            
+            <fontSize>14</fontSize>
+            <textColor>0x000000</textColor>
+            <alignment>0</alignment>
+            <spaceBefore>8</spaceBefore>
+            <spaceAfter>8</spaceAfter>
+            <backColor>0xFFFFFF</backColor>
+            <borderColor>0x000000</borderColor>
+            <borderWidth>0</borderWidth>
+            <borderPadding>0</borderPadding>
+            <textTransform>none</textTransform>
+        </heading2>
+        <heading3>
+            <font>Times-Bold</font>
+            
+            <fontSize>12</fontSize>
+            <textColor>0x000000</textColor>
+            <alignment>0</alignment>
+            <spaceBefore>0</spaceBefore>
+            <spaceAfter>14</spaceAfter>
+            <backColor>0xFFFFFF</backColor>
+            <borderColor>0x000000</borderColor>
+            <borderWidth>0</borderWidth>
+            <borderPadding>0</borderPadding>
+            <textTransform>none</textTransform>
+        </heading3>
+        <heading4>
+            <font>Times-Bold</font>
+            
+            <fontSize>12</fontSize>
+            <textColor>0x000000</textColor>
+            <alignment>0</alignment>
+            <spaceBefore>0</spaceBefore>
+            <spaceAfter>14</spaceAfter>
+            <backColor>0xFFFFFF</backColor>
+            <borderColor>0x000000</borderColor>
+            <borderWidth>0</borderWidth>
+            <borderPadding>0</borderPadding>
+            <textTransform>none</textTransform>
+        </heading4>
+    </FontSettings>
+    <PageSettings>hawkeye<height>11</height>
+        
+        <width>8.5</width>
+        <backImg>path</backImg>
+        
+        <rightMargin>50</rightMargin>
+        <leftMargin>50</leftMargin>
+        <topMargin>50</topMargin>
+        <bottomMargin>50</bottomMargin>
+        <showBoundary>0</showBoundary>
+        <allowSplitting>1</allowSplitting>
+    </PageSettings>
+    <theme>daredevil</theme>
+</data>
