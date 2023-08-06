@@ -2,10 +2,8 @@ import sys
 from PyQt5.QtCore import Qt
 import config_reader
 from PyQt5.QtWidgets import QMainWindow, QWidget, QLineEdit, QPushButton, \
-    QCheckBox, QVBoxLayout, QLabel, QComboBox, QDesktopWidget
+    QCheckBox, QVBoxLayout, QLabel, QComboBox, QDesktopWidget, QFormLayout
 from PyQt5 import QtCore
-
-# TODO - option to open on startup
 
 '''
 Settings for:
@@ -15,132 +13,10 @@ Page size, color, margins
 2. update the form values with getXML()
 '''
 
-global text
-global heading1
-global heading2
-global heading3
-global heading4
-global PageSettings
-global LayoutSettings
-
-
-def setText(a, s, t=0):
-    if t==0:
-        print("missing requested value")
-    elif a not in ('text', 'h1', 'h2', 'h3', 'h4'):
-        print("missing requested attribute")
-    else:
-        if s=='font':
-            config_reader.setXML(a,'font',t)
-        elif s=='size':
-            config_reader.setXML(a,'size',t)
-        elif s=='color':
-            config_reader.setXML(a,'color',t)
-        else:
-            print("attribute name not valid")
-
-def setPage(s, t=0):
-    if t==0:
-        print("missing requested value")
-    else:
-        if s=='font':
-            config_reader.setXML('font',t)
-        elif s=='size':
-            config_reader.setXML('size',t)
-        elif s=='color':
-            config_reader.setXML('color',t)
-        else:
-            print("attribute name not valid")
-
-def setLayout(s, t=0):
-    if t==0:
-        print("missing requested value")
-    else:
-        if s=='font':
-            config_reader.setXML('font',t)
-        elif s=='size':
-            config_reader.setXML('size',t)
-        elif s=='color':
-            config_reader.setXML('color',t)
-        else:
-            print("attribute name not valid")
-
-def setTheme(s, t=0):
-    if t==0:
-        print("missing requested value")
-    else:
-        if s=='font':
-            config_reader.setXML('font',t)
-        elif s=='size':
-            config_reader.setXML('size',t)
-        elif s=='color':
-            config_reader.setXML('color',t)
-        else:
-            print("attribute name not valid")
-
-def get_Everything(thm):
-    # weather value
-    # weath_value = config_reader.getXML('weather')
-    # if weath_value == str(0):
-    #     weath.setCheckState(Qt.Unchecked)
-    # elif weath_value == str(2):
-    #     weath.setCheckState(Qt.Checked)
-    # else:
-    #     print("get_Everything invalid value for weather")
-    # # banking value
-    # bank_value = config_reader.getXML('banking')
-    # if bank_value == str(0):
-    #     bank.setCheckState(Qt.Unchecked)
-    # elif bank_value == str(2):
-    #     bank.setCheckState(Qt.Checked)
-    # else:
-    #     print("get_Everything invalid value for banking")
-    # # to-do value
-    # td_value = config_reader.getXML('todo')
-    # if td_value == str(0):
-    #     td.setCheckState(Qt.Unchecked)
-    # elif td_value == str(2):
-    #     td.setCheckState(Qt.Checked)
-    # else:
-    #     print("get_Everything invalid value for todo")
-    # # reading value
-    # read_value = config_reader.getXML('reading')
-    # if read_value == str(0):
-    #     read.setCheckState(Qt.Unchecked)
-    # elif read_value == str(2):
-    #     read.setCheckState(Qt.Checked)
-    # else:
-    #     print("get_Everything invalid value for reading")
-    # # wardrobe value
-    # ward_value = config_reader.getXML('wardrobe')
-    # if ward_value == str(0):
-    #     ward.setCheckState(Qt.Unchecked)
-    # elif ward_value == str(2):
-    #     ward.setCheckState(Qt.Checked)
-    # else:
-    #     print("get_Everything invalid value for wardrobe")
-    # theme value
-    thm_value = config_reader.getXML('theme')
-    if thm_value == "light":
-        thm.setCurrentText("Light Mode")
-    elif thm_value == "dark":
-        thm.setCurrentText("Dark Mode")
-    elif thm_value == "hawkeye":
-        thm.setCurrentText("Hawkeye")
-    elif thm_value == "daredevil":
-        thm.setCurrentText("Daredevil")
-    elif thm_value == "cottage":
-        thm.setCurrentText("Cottage Life")
-    elif thm_value == "teal":
-        thm.setCurrentText("Teal")
-    elif thm_value == "pastel":
-        thm.setCurrentText("Pastel")
-    else:
-        print("get_Everything invalid value for theme")
 
 def get_theme(attribute):
     thm_value = config_reader.getXML('theme')
-    background_color = "background-color: white;"
+    background_color = "background-color: white; color: black;"
     button_color = "background-color: gray; color: black;"
     unused_button_color = "background-color: gray; color: black; text-decoration: line-through"
     open_item_color = "background-color: gray; color: black;"
@@ -150,7 +26,7 @@ def get_theme(attribute):
                       "QListWidget QScrollBar{background : white;}" \
                       "QListView::item:selected{background: dark-gray; color: white;}"
     if thm_value == "light":
-        background_color = "background-color: #c0c2ce;"
+        background_color = "background-color: #c0c2ce; color: black;"
         button_color = "background-color: #e9e9ef; color: black;"
         open_item_color = "background-color: #e5e6eb; color: black;"
         completed_item_color = "background-color: #d2d4dc; color: black; text-decoration: line-through;"
@@ -160,7 +36,7 @@ def get_theme(attribute):
         unused_button_color = "background-color: #b6b6c4; color: black; text-decoration: line-through;"
         text_color = "color: black;"
     elif thm_value == "dark":
-        background_color = "background-color: #1e2020;"
+        background_color = "background-color: #1e2020; color: white;"
         button_color = "background-color: #3b444b; color: white;"
         unused_button_color = "background-color: gray; color: black; text-decoration: line-through"
         open_item_color = "background-color: #232b2b; color: white;"
@@ -170,7 +46,7 @@ def get_theme(attribute):
                           "QListView::item:selected{background: #232b2b; color: white;}"
         text_color = "color: white;"
     elif thm_value == "hawkeye":
-        background_color = "background-color: #4a454f;"
+        background_color = "background-color: #4a454f; color: #e2cfe6;"
         button_color = "background-color: #5f68ab; color: #cfd1e5;"
         open_item_color = "background-color: #bc8fc4; color: black;"
         completed_item_color = "background-color: #79519a; color: white;"
@@ -180,7 +56,7 @@ def get_theme(attribute):
         unused_button_color = "background-color: #393e66; color: #cfd1e5; text-decoration: line-through;"
         text_color = "color: #e2cfe6;"
     elif thm_value == "daredevil":
-        background_color = "background-color: #522022;"
+        background_color = "background-color: #522022; color: #f4e4e5;"
         button_color = "background-color: #3a1618; color: #f4e4e5;"
         open_item_color = "background-color: #873438; color: #f4e4e5;"
         completed_item_color = "background-color: #ac4e48; color: #f4e4e5; text-decoration: line-through;"
@@ -190,7 +66,7 @@ def get_theme(attribute):
         unused_button_color = "background-color: #230d0e; color: #f4e4e5; text-decoration: line-through;"
         text_color = "color: #f4e4e5;"
     elif thm_value == "cottage":
-        background_color = "background-color: #4a3636;"
+        background_color = "background-color: #4a3636; color: #d7bebe;"
         button_color = "background-color: #7b2727; color: #d7bebe;"
         unused_button_color = "background-color: #31413f; color: #d7bebe; text-decoration: line-through"
         open_item_color = "background-color: #819b97; color: black;"
@@ -200,7 +76,7 @@ def get_theme(attribute):
                           "QListWidget QScrollBar{background : #4a3636;}" \
                           "QListView::item:selected{background: #819b97; color: black;}"
     elif thm_value == "teal":
-        background_color = "background-color: #007777;"
+        background_color = "background-color: #007777; color: black;"
         button_color = "background-color: #004444; color: #e5f1f1"
         unused_button_color = "background-color: #003333; color: #e5f1f1; text-decoration: line-through"
         open_item_color = "background-color: #005555; color: black;"
@@ -210,7 +86,7 @@ def get_theme(attribute):
                           "QListWidget QScrollBar{background : #007777;}" \
                           "QListView::item:selected{background: #003333; color: #e5f1f1;}"
     elif thm_value == "pastel":
-        background_color = "background-color: #f7cac9;"
+        background_color = "background-color: #f7cac9; color: black;"
         button_color = "background-color: #c5b9cd; color: black;"
         unused_button_color = "background-color: #92a8d1; color: black; text-decoration: line-through"
         open_item_color = "background-color: #dec2cb; color: black;"
@@ -243,6 +119,7 @@ def get_theme(attribute):
 class MSettings(QMainWindow):
     window_closed = QtCore.pyqtSignal()
     theme_changed = QtCore.pyqtSignal()
+
     def __init__(self):
         super().__init__()
         # Default Theme
@@ -250,59 +127,123 @@ class MSettings(QMainWindow):
         self.setStyleSheet(get_theme('background_color'))
         self.setWindowTitle('Settings')
         self.setBaseSize(180, 300)
+        generalLayout = QFormLayout()
         # create widgets
-        displayed_label = QLabel("label template")
-        weather_checkbox = QCheckBox("checkbox template")
-        weather_zip = QLineEdit("line template")
-        weather_zip_submit = QPushButton('button template')
-        theme = QComboBox()
-        theme.addItems(["Light Mode", "Dark Mode", "Hawkeye", "Daredevil", "Cottage Life", "Teal", "Pastel"])
-        displayed_label.setStyleSheet(get_theme('text_color'))
-        weather_checkbox.setStyleSheet(get_theme('text_color'))
-        weather_zip.setStyleSheet(get_theme('open_item_color'))
-        weather_zip_submit.setStyleSheet(get_theme('button_color'))
-        theme.setStyleSheet(get_theme('open_item_color'))
+        self.dataNameL = QLabel("Database Name:")
+        self.dataName = QLineEdit()
+        self.userNameL = QLabel("User:")
+        self.userName = QLineEdit()
+        self.hostNameL = QLabel("Host:")
+        self.hostName = QLineEdit()
+        self.passNameL = QLabel("Password:")
+        self.passName = QLineEdit()
+        self.portNameL = QLabel("User:")
+        self.portName = QLineEdit()
+        self.themeL = QLabel("App Theme:")
+        self.theme = QComboBox()
+        self.theme.addItems(["Light Mode", "Dark Mode", "Hawkeye", "Daredevil", "Cottage Life", "Teal", "Pastel"])
 
-        get_Everything(theme)
+        self.dataNameL.setStyleSheet(get_theme('text_color'))
+        self.dataName.setStyleSheet(get_theme('open_item_color'))
+        self.userNameL.setStyleSheet(get_theme('text_color'))
+        self.userName.setStyleSheet(get_theme('open_item_color'))
+        self.hostNameL.setStyleSheet(get_theme('text_color'))
+        self.hostName.setStyleSheet(get_theme('open_item_color'))
+        self.passNameL.setStyleSheet(get_theme('text_color'))
+        self.passName.setStyleSheet(get_theme('open_item_color'))
+        self.portNameL.setStyleSheet(get_theme('text_color'))
+        self.portName.setStyleSheet(get_theme('open_item_color'))
+
+        # todo get a list of tags from the generator and provide a ton of checkboxes for them
+        # weather_checkbox = QCheckBox("checkbox template")
+        # weather_checkbox.setStyleSheet(get_theme('text_color'))
+        self.themeL.setStyleSheet(get_theme('text_color'))
+        self.theme.setStyleSheet(get_theme('open_item_color'))
+        save = QPushButton('Save')
+        save.setStyleSheet(get_theme('button_color'))
+
+        # get current values
+        self.get_Everything()
 
         # create layout and add widgets
-        generalLayout = QVBoxLayout()
-        generalLayout.addWidget(displayed_label)
-        generalLayout.addWidget(weather_checkbox)
-        generalLayout.addWidget(weather_zip)
-        generalLayout.addWidget(weather_zip_submit)
-        generalLayout.addWidget(theme)
+        generalLayout.addRow(self.dataNameL, self.dataName)
+        generalLayout.addRow(self.userNameL, self.userName)
+        generalLayout.addRow(self.hostNameL, self.hostName)
+        generalLayout.addRow(self.passNameL, self.passName)
+        generalLayout.addRow(self.portNameL, self.portName)
+
+        generalLayout.addRow(self.themeL, self.theme)
+        generalLayout.addRow("", save)
 
         # set on-click actions
-        # weather_checkbox.stateChanged.connect(setText)
-        theme.currentTextChanged.connect(self.set_Theme)
-
+        self.theme.currentTextChanged.connect(self.set_Theme)
+        save.clicked.connect(self.setEverything)
         # add everything into the window
         widget = QWidget()
         widget.setLayout(generalLayout)
         self.setCentralWidget(widget)
+
+    def createButtons(self):
+        print("creating buttons")
+    def get_Everything(self):
+        # database credentials
+        self.dataName.setText(config_reader.getXML('database'))
+        self.userName.setText(config_reader.getXML('user'))
+        self.hostName.setText(config_reader.getXML('host'))
+        self.passName.setText(config_reader.getXML('password'))
+        self.portName.setText(config_reader.getXML('port'))
+        # theme
+        thm_value = config_reader.getXML('theme')
+        if thm_value == "light":
+            self.theme.setCurrentText("Light Mode")
+        elif thm_value == "dark":
+            self.theme.setCurrentText("Dark Mode")
+        elif thm_value == "hawkeye":
+            self.theme.setCurrentText("Hawkeye")
+        elif thm_value == "daredevil":
+            self.theme.setCurrentText("Daredevil")
+        elif thm_value == "cottage":
+            self.theme.setCurrentText("Cottage Life")
+        elif thm_value == "teal":
+            self.theme.setCurrentText("Teal")
+        elif thm_value == "pastel":
+            self.theme.setCurrentText("Pastel")
+        else:
+            print("get_Everything invalid value for theme")
 
     def location_on_the_screen(self):
         self.move(600, 400)
 
     def set_Theme(self, s):
         if s == "Light Mode":
-            config_reader.setXML('theme', 0, 'light')
+            config_reader.setXML('theme', 'light')
         elif s == "Dark Mode":
-            config_reader.setXML('theme', 0, 'dark')
+            config_reader.setXML('theme', 'dark')
         elif s == "Hawkeye":
-            config_reader.setXML('theme', 0, 'hawkeye')
+            config_reader.setXML('theme', 'hawkeye')
         elif s == "Daredevil":
-            config_reader.setXML('theme', 0, 'daredevil')
+            config_reader.setXML('theme', 'daredevil')
         elif s == "Cottage Life":
-            config_reader.setXML('theme', 0, 'cottage')
+            config_reader.setXML('theme', 'cottage')
         elif s == "Teal":
-            config_reader.setXML('theme', 0, 'teal')
+            config_reader.setXML('theme', 'teal')
         elif s == "Pastel":
-            config_reader.setXML('theme', 0, 'pastel')
+            config_reader.setXML('theme', 'pastel')
         else:
             print("invalid theme")
         self.theme_changed.emit()
+
+    def setEverything(self):
+        if self.dataName != "":
+            config_reader.setXML('database', self.dataName.text())
+        if self.userName != "":
+            config_reader.setXML('user', self.userName.text())
+        if self.hostName != "":
+            config_reader.setXML('host', self.hostName.text())
+        if self.passName != "":
+            config_reader.setXML('password', self.passName.text())
+        if self.portName != "":
+            config_reader.setXML('port', self.portName.text())
 
     def closeEvent(self, event):
         self.window_closed.emit()

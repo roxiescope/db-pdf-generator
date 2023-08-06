@@ -8,8 +8,11 @@ Objective:
 
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, \
-    QVBoxLayout, QGridLayout, QLabel, QLineEdit, QFormLayout, QCheckBox, QDialog, QFileDialog
+    QVBoxLayout, QGridLayout, QLabel, QLineEdit, QFormLayout, QCheckBox, QMessageBox
 from PyQt5.QtCore import Qt
+from file_browser import FileBrowser
+import generator
+import config_reader
 
 
 __version__ = '0.1'
@@ -19,16 +22,16 @@ import Settings
 
 ERROR_MSG = 'ERROR'
 
+
 class MaeveUI(QMainWindow):
     def __init__(self):
         super().__init__()
         # Variables to track which windows are open
         self.settings_open = False
         self.Maeve_open = False
-        self.Todo_open = False
-        self.Reading_open = False
+
         # Setting window color based on theme from settings
-        self.setBaseSize(300, 300)
+        self.setBaseSize(400, 300)
         self.setStyleSheet(Settings.get_theme('background_color'))
         self.setWindowTitle('Rox Loves Gus')
         # Central widget and general layout of window
@@ -44,23 +47,36 @@ class MaeveUI(QMainWindow):
     def _createButtons(self):
         buttonsLayout = QFormLayout()
 
+        self.mdCheck = QCheckBox()
+        self.mdPath = FileBrowser(0, FileBrowser.OpenDirectory)
+        self.mdName = QLineEdit()
+        self.pdfCheck = QCheckBox()
+        self.pdfPath = FileBrowser(1, FileBrowser.OpenDirectory)
+        self.pdfName = QLineEdit()
+
+        self.warning = QMessageBox()
+        self.warning.setStyleSheet(Settings.get_theme("background_color"))
+        self.warning.setText("Make sure the file(s) exist in the directory you want before closing. "
+                             "Depending on your settings the generator might take a while and "
+                             "I don't have a progress bar yet love you")
+
+        if config_reader.getXML('mdLastSetting') == '2':
+            self.mdCheck.setChecked(True)
+        if config_reader.getXML('pdfLastSetting') == '2':
+            self.pdfCheck.setChecked(True)
+        self.mdName.setText(config_reader.getXML('mdLastName'))
+        self.pdfName.setText(config_reader.getXML('pdfLastName'))
+
         settingsButton = QPushButton("Settings")
         settingsButton.setStyleSheet(Settings.get_theme("button_color"))
         settingsButton.setFixedSize(200, 40)
-        mdSearchButton = QPushButton("Browse")
-        mdSearchButton.setStyleSheet(Settings.get_theme("text_color"))
-        mdSearchButton.setFixedSize(200, 40)
-        pdfSearchButton = QPushButton("Browse")
-        pdfSearchButton.setStyleSheet(Settings.get_theme("text_color"))
-        pdfSearchButton.setFixedSize(200, 40)
         generate = QPushButton("Generate")
         generate.setStyleSheet(Settings.get_theme("button_color"))
         generate.setFixedSize(200, 40)
 
-
         mdCheckL = QLabel("generate markdown file")
         mdCheckL.setStyleSheet(Settings.get_theme("text_color"))
-        mdPathL = QLabel("markdown output location")
+        mdPathL = QLabel("md output location")
         mdPathL.setStyleSheet(Settings.get_theme("text_color"))
         mdNameL = QLabel("markdown file name")
         mdNameL.setStyleSheet(Settings.get_theme("text_color"))
@@ -71,34 +87,24 @@ class MaeveUI(QMainWindow):
         pdfNameL = QLabel("pdf file name")
         pdfNameL.setStyleSheet(Settings.get_theme("text_color"))
 
-        mdCheck = QCheckBox()
-        mdCheck.setStyleSheet(Settings.get_theme("text_color"))
-        mdPath = QLineEdit()
-        mdPath.setStyleSheet(Settings.get_theme("open_item_color"))
-        mdName = QLineEdit()
-        mdName.setStyleSheet(Settings.get_theme("open_item_color"))
-        pdfCheck = QCheckBox()
-        pdfCheck.setStyleSheet(Settings.get_theme("text_color"))
-        pdfPath = QLineEdit()
-        pdfPath.setStyleSheet(Settings.get_theme("open_item_color"))
-        pdfName = QLineEdit()
-        pdfName.setStyleSheet(Settings.get_theme("open_item_color"))
-
+        self.mdCheck.setStyleSheet(Settings.get_theme("text_color"))
+        self.mdPath.setStyleSheet(Settings.get_theme("open_item_color"))
+        self.mdName.setStyleSheet(Settings.get_theme("open_item_color"))
+        self.pdfCheck.setStyleSheet(Settings.get_theme("text_color"))
+        self.pdfPath.setStyleSheet(Settings.get_theme("open_item_color"))
+        self.pdfName.setStyleSheet(Settings.get_theme("open_item_color"))
 
         buttonsLayout.addRow("", settingsButton)
-        buttonsLayout.addRow(mdCheckL, mdCheck)
-        buttonsLayout.addRow(mdPathL, mdPath)
-        buttonsLayout.addRow("", mdSearchButton)
-        buttonsLayout.addRow(mdNameL, mdName)
-        buttonsLayout.addRow(pdfCheckL, pdfCheck)
-        buttonsLayout.addRow(pdfPathL, pdfPath)
-        buttonsLayout.addRow("", pdfSearchButton)
-        buttonsLayout.addRow(pdfNameL, pdfName)
+        buttonsLayout.addRow(mdCheckL, self.mdCheck)
+        buttonsLayout.addRow(mdPathL, self.mdPath)
+        buttonsLayout.addRow(mdNameL, self.mdName)
+        buttonsLayout.addRow(pdfCheckL, self.pdfCheck)
+        buttonsLayout.addRow(pdfPathL, self.pdfPath)
+        buttonsLayout.addRow(pdfNameL, self.pdfName)
         buttonsLayout.addRow("", generate)
-        buttonsLayout.setAlignment(Qt.AlignRight)
+        # buttonsLayout.setLabelAlignment(Qt.AlignCenter)
 
         self.generalLayout.addLayout(buttonsLayout)
-        # mdSearchButton.clicked.connect(self.browseFiles())
         settingsButton.clicked.connect(self.settings_clicked)
         generate.clicked.connect(self.generate_clicked)
 
@@ -115,12 +121,30 @@ class MaeveUI(QMainWindow):
             self.settings_dialog.window_closed.connect(self.settings_closed)
 
     def generate_clicked(self):
-        print("generate files")
+        x = self.warning.exec_()
+        if self.mdCheck.checkState() == 2:
+            generator.generateMarkdown(self.mdName.text(), self.mdPath.getPaths()[0], True)
+        if self.pdfCheck.checkState() == 2:
+            generator.generatePdf(self.pdfName.text(), self.pdfPath.getPaths()[0])
 
     def settings_closed(self):
         self.settings_open = False
 
     def closeEvent(self, event):
+        # recording settings in config
+        config_reader.setXML('mdLastSetting', str(self.mdCheck.checkState()))
+        config_reader.setXML('mdLastName', str(self.mdName.text()))
+        config_reader.setXML('pdfLastSetting', str(self.pdfCheck.checkState()))
+        config_reader.setXML('pdfLastName', str(self.pdfName.text()))
+        if len(self.mdPath.getPaths()) != 0:
+            config_reader.setXML('mdLastDirectory', str(self.mdPath.getPaths()[0]))
+        else:
+            config_reader.setXML('mdLastDirectory', '[]')
+        if len(self.pdfPath.getPaths()) != 0:
+            config_reader.setXML('pdfLastDirectory', str(self.pdfPath.getPaths()[0]))
+        else:
+            config_reader.setXML('pdfLastDirectory', '[]')
+
         for window in QApplication.topLevelWidgets():
             window.close()
 
@@ -136,7 +160,7 @@ class MaeveUI(QMainWindow):
             for g in e:
                 g.deleteLater()
             self.setStyleSheet(Settings.get_theme('background_color'))
-            self.setWindowTitle('Maeve')
+            self.setWindowTitle('Rox Loves Gus')
             # Central widget and general layout of window
             self.generalLayout = QVBoxLayout()
             self._centralWidget = QWidget(self)
@@ -146,17 +170,8 @@ class MaeveUI(QMainWindow):
             # Display and buttons
             self._createButtons()
 
-    def browseFiles(self):
-        fname = QFileDialog.getOpenFileName(self, 'Open Folder','./')
-        print(str(fname))
-        # self.filename.setText(fname[0])
 
 def main():
-    # todo: make app run in taskbar
-    # check if any items are past due on startup
-    # check if toast_test.py is running
-    # if it is: do nothing
-    # if it isn't: start it up
     maeve = QApplication(sys.argv)
     maeve.setStyle("Fusion")
     view = MaeveUI()
