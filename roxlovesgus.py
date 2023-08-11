@@ -122,10 +122,18 @@ class MaeveUI(QMainWindow):
 
     def generate_clicked(self):
         x = self.warning.exec_()
+        m = ''
+        p = ''
+        for y in self.mdPath.getPaths():
+            m = y
+        for z in self.pdfPath.getPaths():
+            p = z
         if self.mdCheck.checkState() == 2:
-            generator.generateMarkdown(self.mdName.text(), self.mdPath.getPaths()[0], True)
+            generator.generateMarkdown(self.mdName.text(), m, True)
+            config_reader.setXML("mdLastDirectory", m)
         if self.pdfCheck.checkState() == 2:
-            generator.generatePdf(self.pdfName.text(), self.pdfPath.getPaths()[0])
+            generator.generatePdf(self.pdfName.text(), p)
+            config_reader.setXML("pdfLastDirectory", m)
 
     def settings_closed(self):
         self.settings_open = False
@@ -136,12 +144,18 @@ class MaeveUI(QMainWindow):
         config_reader.setXML('mdLastName', str(self.mdName.text()))
         config_reader.setXML('pdfLastSetting', str(self.pdfCheck.checkState()))
         config_reader.setXML('pdfLastName', str(self.pdfName.text()))
+        m = ''
+        p = ''
+        for y in self.mdPath.getPaths():
+            m = y
+        for z in self.pdfPath.getPaths():
+            p = z
         if len(self.mdPath.getPaths()) != 0:
-            config_reader.setXML('mdLastDirectory', str(self.mdPath.getPaths()[0]))
+            config_reader.setXML('mdLastDirectory', str(m))
         else:
             config_reader.setXML('mdLastDirectory', '[]')
         if len(self.pdfPath.getPaths()) != 0:
-            config_reader.setXML('pdfLastDirectory', str(self.pdfPath.getPaths()[0]))
+            config_reader.setXML('pdfLastDirectory', str(p))
         else:
             config_reader.setXML('pdfLastDirectory', '[]')
 

@@ -51,6 +51,21 @@ def getXML(attribute, subattribute=''):
         # TODO: create xml with default values
 
 
+def getXMLName(attribute, subattribute=''):
+    file = glob.glob(mConfigLoc, recursive=False)
+    if file:
+        tree = ET.parse(mConfigLoc)
+        root = tree.getroot()
+        for x in root.iter(attribute):
+            if subattribute == '':
+                return x.get('name')
+            else:
+                for y in x.iter(subattribute):
+                    return y.get('name')
+    else:
+        print("you need to make the xml")
+        # TODO: create xml with default values
+
 def setXML(attribute, value, subattribute=''):
     file = glob.glob(mConfigLoc, recursive=False)
     tree = ET.parse(mConfigLoc)
@@ -66,3 +81,15 @@ def setXML(attribute, value, subattribute=''):
         print("you need to make the xml")
         # TODO: create xml with default values
     tree.write(mConfigLoc)
+
+def getXMLChildren(attribute):
+    file = glob.glob(mConfigLoc, recursive=False)
+    if file:
+        tree = ET.parse(mConfigLoc)
+        root = tree.getroot()
+        for x in root.findall(attribute):
+            return x.findall("*")
+        # for x in root.find(attribute):
+        #     return x.attrib
+    else:
+        print("you need to make the xml")

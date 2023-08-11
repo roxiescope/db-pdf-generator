@@ -1,115 +1,109 @@
 <data>
-    <databaseCreds>
-        <database>fictionalUniverse</database>
-        <user>postgres</user>
-        <host>localhost</host>
-        <password>gay</password>
-        <port>5433</port>
+    <databaseCreds name="DATABASE CREDENTIALS">
+        <database name="Database Name:">fictionalUniverse</database>
+        <user name="User:">postgres</user>
+        <host name="Host:">localhost</host>
+        <password name="Password:">gay</password>
+        <port name="Port:">5433</port>
     </databaseCreds>
-    <FontSettings>
-        <text>
-            <font>Times-Roman</font>
-            <fontSize>10</fontSize>
-            <textColor>0x000000</textColor>
-            <alignment>0</alignment>
-            <spaceAfter>0</spaceAfter>
-            <backColor>0xFFFFFF</backColor>
-            <borderColor>0x000000</borderColor>
-            <borderWidth>0</borderWidth>
-            <borderPadding>0</borderPadding>
-            <textTransform>none</textTransform>
-            <firstLineIndent>0</firstLineIndent>
-        </text>
-        <bullet>
-            <font>Times-Roman</font>
-            
-            <fontSize>10</fontSize>
-            <textColor>0x000000</textColor>
-            <alignment>0</alignment>
-            <spaceAfter>3</spaceAfter>
-            <backColor>0xFFFFFF</backColor>
-            <borderColor>0x000000</borderColor>
-            <borderWidth>0</borderWidth>
-            <borderPadding>0</borderPadding>
-            <textTransform>none</textTransform>
-            <firstLineIndent>0</firstLineIndent>
-            <bulletIndent>3</bulletIndent>
-            <leftIndent>12</leftIndent>
-        </bullet>
-        <heading1>
-            <font>Times-Bold</font>
-            
-            <fontSize>16</fontSize>
-            <textColor>0x000000</textColor>
-            <alignment>0</alignment>
-            <spaceBefore>8</spaceBefore>
-            <spaceAfter>14</spaceAfter>
-            <backColor>0xFFFFFF</backColor>
-            <borderColor>0x000000</borderColor>
-            <borderWidth>0</borderWidth>
-            <borderPadding>0</borderPadding>
-            <textTransform>none</textTransform>
-        </heading1>
-        <heading2>
-            <font>Times-Bold</font>
-            
-            <fontSize>14</fontSize>
-            <textColor>0x000000</textColor>
-            <alignment>0</alignment>
-            <spaceBefore>8</spaceBefore>
-            <spaceAfter>8</spaceAfter>
-            <backColor>0xFFFFFF</backColor>
-            <borderColor>0x000000</borderColor>
-            <borderWidth>0</borderWidth>
-            <borderPadding>0</borderPadding>
-            <textTransform>none</textTransform>
-        </heading2>
-        <heading3>
-            <font>Times-Bold</font>
-            
-            <fontSize>12</fontSize>
-            <textColor>0x000000</textColor>
-            <alignment>0</alignment>
-            <spaceBefore>0</spaceBefore>
-            <spaceAfter>14</spaceAfter>
-            <backColor>0xFFFFFF</backColor>
-            <borderColor>0x000000</borderColor>
-            <borderWidth>0</borderWidth>
-            <borderPadding>0</borderPadding>
-            <textTransform>none</textTransform>
-        </heading3>
-        <heading4>
-            <font>Times-Bold</font>
-            
-            <fontSize>12</fontSize>
-            <textColor>0x000000</textColor>
-            <alignment>0</alignment>
-            <spaceBefore>0</spaceBefore>
-            <spaceAfter>14</spaceAfter>
-            <backColor>0xFFFFFF</backColor>
-            <borderColor>0x000000</borderColor>
-            <borderWidth>0</borderWidth>
-            <borderPadding>0</borderPadding>
-            <textTransform>none</textTransform>
-        </heading4>
-    </FontSettings>
-    <PageSettings>
-        <height>11</height>
-        <width>8.5</width>
-        <backImg>path</backImg>
-        <rightMargin>50</rightMargin>
-        <leftMargin>50</leftMargin>
-        <topMargin>50</topMargin>
-        <bottomMargin>50</bottomMargin>
-        <showBoundary>0</showBoundary>
-        <allowSplitting>1</allowSplitting>
+    <text name="TEXT SETTINGS">
+        <font name="Font:">Times-Roman</font>
+        <fontSize name="Font Size:">10</fontSize>
+        <textColor name="Font Color:">0x000000</textColor>
+        <alignment name="Alignment:">0</alignment>
+        <spaceAfter name="Space After:">0</spaceAfter>
+        <backColor name="Text Background:" />
+        <borderColor name="Border Color:">0x000000</borderColor>
+        <borderWidth name="Border Width:">0</borderWidth>
+        <borderPadding name="Border Padding:">0</borderPadding>
+        <textTransform name="Text Transform:">none</textTransform>
+        <firstLineIndent name="First Line Indent:">0</firstLineIndent>
+    </text>
+    <bullet name="BULLET SETTINGS">
+        <font name="Font:">Times-Roman</font>
+        <fontSize name="Font Size:">10</fontSize>
+        <textColor name="Font Color:">0x000000</textColor>
+        <alignment name="Alignment:">0</alignment>
+        <spaceAfter name="Space After:">3</spaceAfter>
+        <backColor name="Text Background:" />
+        <borderColor name="Border Color:">0x000000</borderColor>
+        <borderWidth name="Border Width:">0</borderWidth>
+        <borderPadding name="Border Padding:">0</borderPadding>
+        <textTransform name="Text Transform:">none</textTransform>
+        <firstLineIndent name="First Line Indent:">0</firstLineIndent>
+        <bulletIndent name="Bullet Indent:">3</bulletIndent>
+        <leftIndent name="Left Indent:">12</leftIndent>
+    </bullet>
+    <heading1 name="HEADING 1 SETTINGS">
+        <font name="Font:">Times-Bold</font>
+        <fontSize name="Font Size:">16</fontSize>
+        <textColor name="Font Color:">0x000000</textColor>
+        <alignment name="Alignment:">0</alignment>
+        <spaceBefore name="Space Before:">8</spaceBefore>
+        <spaceAfter name="Space After:">14</spaceAfter>
+        <backColor name="Text Background:" />
+        <borderColor name="Border Color:">0x000000</borderColor>
+        <borderWidth name="Border Width:">0</borderWidth>
+        <borderPadding name="Border Padding:">0</borderPadding>
+        <textTransform name="Text Transform:">none</textTransform>
+    </heading1>
+    <heading2 name="HEADING 2 SETTINGS">
+        <font name="Font:">Times-Bold</font>
+        <fontSize name="Font Size:">14</fontSize>
+        <textColor name="Font Color:">0x000000</textColor>
+        <alignment name="Alignment:">0</alignment>
+        <spaceBefore name="Space Before:">8</spaceBefore>
+        <spaceAfter name="Space After:">8</spaceAfter>
+        <backColor name="Text Background:" />
+        <borderColor name="Border Color:">0x000000</borderColor>
+        <borderWidth name="Border Width:">0</borderWidth>
+        <borderPadding name="Border Padding:">0</borderPadding>
+        <textTransform name="Text Transform:">none</textTransform>
+    </heading2>
+    <heading3 name="HEADING 3 SETTINGS">
+        <font name="Font:">Times-Bold</font>
+
+        <fontSize name="Font Size:">12</fontSize>
+        <textColor name="Font Color:">0x000000</textColor>
+        <alignment name="Alignment:">0</alignment>
+        <spaceBefore name="Space Before:">0</spaceBefore>
+        <spaceAfter name="Space After:">14</spaceAfter>
+        <backColor name="Text Background:" />
+        <borderColor name="Border Color:">0x000000</borderColor>
+        <borderWidth name="Border Width:">0</borderWidth>
+        <borderPadding name="Border Padding:">0</borderPadding>
+        <textTransform name="Text Transform:">none</textTransform>
+    </heading3>
+    <heading4 name="HEADING 4 SETTINGS">
+        <font name="Font:">Times-Bold</font>
+        <fontSize name="Font Size:">12</fontSize>
+        <textColor name="Font Color:">0x000000</textColor>
+        <alignment name="Alignment:">0</alignment>
+        <spaceBefore name="Space Before:">0</spaceBefore>
+        <spaceAfter name="Space After:">0</spaceAfter>
+        <backColor name="Text Background:" />
+        <borderColor name="Border Color:">0x000000</borderColor>
+        <borderWidth name="Border Width:">0</borderWidth>
+        <borderPadding name="Border Padding:">0</borderPadding>
+        <textTransform name="Text Transform:">none</textTransform>
+    </heading4>
+    <PageSettings name="PAGE SETTINGS">
+        <height name="Height:">11</height>
+        <width name="Width:">8.5</width>
+        <backImg name="Background Image:" />
+        <rightMargin name="Right Margin:">50</rightMargin>
+        <leftMargin name="Left Margin:">50</leftMargin>
+        <topMargin name="Top Margin:">50</topMargin>
+        <bottomMargin name="Bottom Margin:">50</bottomMargin>
+        <showBoundary name="Show Boundary:">0</showBoundary>
+        <allowSplitting name="Allow Splitting:">1</allowSplitting>
     </PageSettings>
-    <theme>daredevil</theme>
-    <tagsToRemove>none</tagsToRemove>
-    <mdLastDirectory>C:/Users/stein/Documents/Github Projects/db-pdf-generator</mdLastDirectory>
-    <mdLastName>seests</mdLastName>
-    <mdLastSetting>2</mdLastSetting>
-    <pdfLastDirectory>C:/Users/stein/Documents/Github Projects/db-pdf-generator</pdfLastDirectory>
-    <pdfLastName>dftes</pdfLastName>
-    <pdfLastSetting>2</pdfLastSetting>
+    <theme name="Name:">daredevil</theme>
+    <tagsToInclude name="Tags to Include:">['planet', 'tech', 'fantasy', 'timeline', 'event', 'intelligence', 'old god', 'universal', 'publication', 'magic', 'psionics', 'chi', 'soul', 'dimensions', 'reality', 'plant', 'race', 'rules', 'profession', 'class', 'weapon', 'gear', 'armor', 'monster', 'equipment']</tagsToInclude>
+    <mdLastDirectory name="Markdown Directory:">C:/Users/stein/Documents/Github Projects/db-pdf-generator/temp</mdLastDirectory>
+    <mdLastName name="Markdown Name:">seests</mdLastName>
+    <mdLastSetting name="Generate Markdown:">2</mdLastSetting>
+    <pdfLastDirectory name="PDF Directory:">C:/Users/stein/Documents/Github Projects/db-pdf-generator/temp</pdfLastDirectory>
+    <pdfLastName name="PDF Name:">dftes</pdfLastName>
+    <pdfLastSetting name="Generate PDF:">2</pdfLastSetting>
 </data>

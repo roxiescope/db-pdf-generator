@@ -1,17 +1,16 @@
+import re
 import sys
 from PyQt5.QtCore import Qt
 import config_reader
 from PyQt5.QtWidgets import QMainWindow, QWidget, QLineEdit, QPushButton, \
-    QCheckBox, QVBoxLayout, QLabel, QComboBox, QDesktopWidget, QFormLayout
+    QCheckBox, QVBoxLayout, QLabel, QComboBox, QDesktopWidget, QFormLayout, QScrollArea
 from PyQt5 import QtCore
+import generator
+from TagDialog import MTag
 
-'''
-Settings for:
-Page size, color, margins
+# 2-d list telling me the XML attribute and sub-attribute for every widget created
+widgets = []
 
-1. get values on the form and send them to setXML()
-2. update the form values with getXML()
-'''
 
 
 def get_theme(attribute):
@@ -126,72 +125,88 @@ class MSettings(QMainWindow):
         # Main window properties
         self.setStyleSheet(get_theme('background_color'))
         self.setWindowTitle('Settings')
-        self.setBaseSize(180, 300)
-        generalLayout = QFormLayout()
-        # create widgets
-        self.dataNameL = QLabel("Database Name:")
-        self.dataName = QLineEdit()
-        self.userNameL = QLabel("User:")
-        self.userName = QLineEdit()
-        self.hostNameL = QLabel("Host:")
-        self.hostName = QLineEdit()
-        self.passNameL = QLabel("Password:")
-        self.passName = QLineEdit()
-        self.portNameL = QLabel("User:")
-        self.portName = QLineEdit()
-        self.themeL = QLabel("App Theme:")
-        self.theme = QComboBox()
-        self.theme.addItems(["Light Mode", "Dark Mode", "Hawkeye", "Daredevil", "Cottage Life", "Teal", "Pastel"])
+        self.setFixedSize(400, 600)
+        self.scroll = QScrollArea()
+        self.generalLayout = QFormLayout()
+        # database credentials
+        self.createDatabaseOptions()
+        # font options
+        self.createTextOptions()
+        self.createBulletOptions()
+        self.createH1Options()
+        self.createH2Options()
+        self.createH3Options()
+        self.createH4Options()
+        # page options
+        self.createPageOptions()
+        # tag options
+        self.createTagOptions()
+        # theme options
+        self.createThemeOptions()
 
-        self.dataNameL.setStyleSheet(get_theme('text_color'))
-        self.dataName.setStyleSheet(get_theme('open_item_color'))
-        self.userNameL.setStyleSheet(get_theme('text_color'))
-        self.userName.setStyleSheet(get_theme('open_item_color'))
-        self.hostNameL.setStyleSheet(get_theme('text_color'))
-        self.hostName.setStyleSheet(get_theme('open_item_color'))
-        self.passNameL.setStyleSheet(get_theme('text_color'))
-        self.passName.setStyleSheet(get_theme('open_item_color'))
-        self.portNameL.setStyleSheet(get_theme('text_color'))
-        self.portName.setStyleSheet(get_theme('open_item_color'))
-
-        # todo get a list of tags from the generator and provide a ton of checkboxes for them
-        # weather_checkbox = QCheckBox("checkbox template")
-        # weather_checkbox.setStyleSheet(get_theme('text_color'))
-        self.themeL.setStyleSheet(get_theme('text_color'))
-        self.theme.setStyleSheet(get_theme('open_item_color'))
         save = QPushButton('Save')
         save.setStyleSheet(get_theme('button_color'))
 
-        # get current values
-        self.get_Everything()
-
         # create layout and add widgets
-        generalLayout.addRow(self.dataNameL, self.dataName)
-        generalLayout.addRow(self.userNameL, self.userName)
-        generalLayout.addRow(self.hostNameL, self.hostName)
-        generalLayout.addRow(self.passNameL, self.passName)
-        generalLayout.addRow(self.portNameL, self.portName)
 
-        generalLayout.addRow(self.themeL, self.theme)
-        generalLayout.addRow("", save)
+        self.generalLayout.addRow(save)
+        self.addToWidgets("Save", "0")
 
         # set on-click actions
         self.theme.currentTextChanged.connect(self.set_Theme)
         save.clicked.connect(self.setEverything)
+        self.tags.clicked.connect(self.getTags)
+
         # add everything into the window
         widget = QWidget()
-        widget.setLayout(generalLayout)
-        self.setCentralWidget(widget)
+        widget.setLayout(self.generalLayout)
+        self.scroll.setWidget(widget)
+        self.setCentralWidget(self.scroll)
 
-    def createButtons(self):
-        print("creating buttons")
-    def get_Everything(self):
-        # database credentials
-        self.dataName.setText(config_reader.getXML('database'))
-        self.userName.setText(config_reader.getXML('user'))
-        self.hostName.setText(config_reader.getXML('host'))
-        self.passName.setText(config_reader.getXML('password'))
-        self.portName.setText(config_reader.getXML('port'))
+    def createDatabaseOptions(self):
+        attributes = config_reader.getXMLChildren("databaseCreds")
+        title = QLabel("<b>" + config_reader.getXMLName("databaseCreds") + "</b>")
+        title.setStyleSheet(get_theme('text_color'))
+        self.generalLayout.addRow(title)
+        self.addToWidgets("databaseCreds", "0")
+        for x in attributes:
+            label = QLabel(config_reader.getXMLName(x.tag))
+            label.setStyleSheet(get_theme('text_color'))
+            value = QLineEdit(x.text)
+            value.setStyleSheet(get_theme('open_item_color'))
+            self.generalLayout.addRow(label, value)
+            self.addToWidgets("databaseCreds", x.tag)
+            self.addToWidgets("databaseCreds", x.tag)
+
+    def createTextOptions(self):
+        attributes = config_reader.getXMLChildren("text")
+        title = QLabel("<b>" + config_reader.getXMLName("text") + "</b>")
+        title.setStyleSheet(get_theme('text_color'))
+        self.generalLayout.addRow(title)
+        self.addToWidgets("text", "0")
+        for x in attributes:
+            label = QLabel(config_reader.getXMLName(x.tag))
+            label.setStyleSheet(get_theme('text_color'))
+            value = QLineEdit(x.text)
+            value.setStyleSheet(get_theme('open_item_color'))
+            self.generalLayout.addRow(label, value)
+            self.addToWidgets("text", x.tag)
+            self.addToWidgets("text", x.tag)
+
+
+    def getTags(self):
+        # 1st column: id of relation, 2nd column: id of page, 3rd column: name of tag
+        tags = generator.getTags()
+        tagList = []
+
+        for r in tags:
+            if r[1] not in tagList:
+                tagList.append(r[1])
+
+        self.tagD = MTag(tagList)
+        self.tagD.show()
+
+    def getTheme(self):
         # theme
         thm_value = config_reader.getXML('theme')
         if thm_value == "light":
@@ -234,19 +249,128 @@ class MSettings(QMainWindow):
         self.theme_changed.emit()
 
     def setEverything(self):
-        if self.dataName != "":
-            config_reader.setXML('database', self.dataName.text())
-        if self.userName != "":
-            config_reader.setXML('user', self.userName.text())
-        if self.hostName != "":
-            config_reader.setXML('host', self.hostName.text())
-        if self.passName != "":
-            config_reader.setXML('password', self.passName.text())
-        if self.portName != "":
-            config_reader.setXML('port', self.portName.text())
+        for x in range(self.generalLayout.count()):
+            if self.generalLayout.itemAt(x).widget():
+                w = self.generalLayout.itemAt(x).widget()
+                if isinstance(w, QLineEdit):
+                    y = widgets[x]
+                    config_reader.setXML(str(y[0]), w.text(), str(y[1]))
+        # todo - refresh pages
+        self.theme_changed.emit()
 
     def closeEvent(self, event):
         self.window_closed.emit()
         event.accept()
         # event.ignore() # if you want the window to never be closed
+
+    def createBulletOptions(self):
+        attributes = config_reader.getXMLChildren("bullet")
+        title = QLabel("<b>" + config_reader.getXMLName("bullet") + "</b>")
+        title.setStyleSheet(get_theme('text_color'))
+        self.generalLayout.addRow(title)
+        self.addToWidgets("bullet", "0")
+        for x in attributes:
+            label = QLabel(config_reader.getXMLName(x.tag))
+            label.setStyleSheet(get_theme('text_color'))
+            value = QLineEdit(x.text)
+            value.setStyleSheet(get_theme('open_item_color'))
+            self.generalLayout.addRow(label, value)
+            self.addToWidgets("bullet", x.tag)
+            self.addToWidgets("bullet", x.tag)
+
+    def createH1Options(self):
+        attributes = config_reader.getXMLChildren("heading1")
+        title = QLabel("<b>" + config_reader.getXMLName("heading1") + "</b>")
+        title.setStyleSheet(get_theme('text_color'))
+        self.generalLayout.addRow(title)
+        self.addToWidgets("heading1", "0")
+        for x in attributes:
+            label = QLabel(config_reader.getXMLName(x.tag))
+            label.setStyleSheet(get_theme('text_color'))
+            value = QLineEdit(x.text)
+            value.setStyleSheet(get_theme('open_item_color'))
+            self.generalLayout.addRow(label, value)
+            self.addToWidgets("heading1", x.tag)
+            self.addToWidgets("heading1", x.tag)
+
+    def createH2Options(self):
+        attributes = config_reader.getXMLChildren("heading2")
+        title = QLabel("<b>" + config_reader.getXMLName("heading2") + "</b>")
+        title.setStyleSheet(get_theme('text_color'))
+        self.generalLayout.addRow(title)
+        self.addToWidgets("heading2", "0")
+        for x in attributes:
+            label = QLabel(config_reader.getXMLName(x.tag))
+            label.setStyleSheet(get_theme('text_color'))
+            value = QLineEdit(x.text)
+            value.setStyleSheet(get_theme('open_item_color'))
+            self.generalLayout.addRow(label, value)
+            self.addToWidgets("heading2", x.tag)
+            self.addToWidgets("heading2", x.tag)
+
+    def createH3Options(self):
+        attributes = config_reader.getXMLChildren("heading3")
+        title = QLabel("<b>" + config_reader.getXMLName("heading3") + "</b>")
+        title.setStyleSheet(get_theme('text_color'))
+        self.generalLayout.addRow(title)
+        self.addToWidgets("heading3", "0")
+        for x in attributes:
+            label = QLabel(config_reader.getXMLName(x.tag))
+            label.setStyleSheet(get_theme('text_color'))
+            value = QLineEdit(x.text)
+            value.setStyleSheet(get_theme('open_item_color'))
+            self.generalLayout.addRow(label, value)
+            self.addToWidgets("heading3", x.tag)
+            self.addToWidgets("heading3", x.tag)
+
+    def createH4Options(self):
+        attributes = config_reader.getXMLChildren("heading4")
+        title = QLabel("<b>" + config_reader.getXMLName("heading4") + "</b>")
+        title.setStyleSheet(get_theme('text_color'))
+        self.generalLayout.addRow(title)
+        self.addToWidgets("heading4", "0")
+        for x in attributes:
+            label = QLabel(config_reader.getXMLName(x.tag))
+            label.setStyleSheet(get_theme('text_color'))
+            value = QLineEdit(x.text)
+            value.setStyleSheet(get_theme('open_item_color'))
+            self.generalLayout.addRow(label, value)
+            self.addToWidgets("heading4", x.tag)
+            self.addToWidgets("heading4", x.tag)
+
+    def createPageOptions(self):
+        attributes = config_reader.getXMLChildren("PageSettings")
+        title = QLabel("<b>" + config_reader.getXMLName("PageSettings") + "</b>")
+        title.setStyleSheet(get_theme('text_color'))
+        self.generalLayout.addRow(title)
+        self.addToWidgets("PageSettings", "0")
+        for x in attributes:
+            label = QLabel(config_reader.getXMLName(x.tag))
+            label.setStyleSheet(get_theme('text_color'))
+            value = QLineEdit(x.text)
+            value.setStyleSheet(get_theme('open_item_color'))
+            self.generalLayout.addRow(label, value)
+            self.addToWidgets("PageSettings", x.tag)
+            self.addToWidgets("PageSettings", x.tag)
+
+    def createTagOptions(self):
+        self.tags = QPushButton('Select Tags')
+        self.tags.setStyleSheet(get_theme('button_color'))
+        self.generalLayout.addRow(self.tags)
+        self.addToWidgets("Tags", "0")
+
+    def createThemeOptions(self):
+        self.themeL = QLabel("App Theme:")
+        self.theme = QComboBox()
+        self.theme.addItems(["Light Mode", "Dark Mode", "Hawkeye", "Daredevil", "Cottage Life", "Teal", "Pastel"])
+        self.themeL.setStyleSheet(get_theme('text_color'))
+        self.theme.setStyleSheet(get_theme('open_item_color'))
+        self.getTheme()
+        self.generalLayout.addRow(self.themeL, self.theme)
+        self.addToWidgets("Theme", "0")
+        self.addToWidgets("Theme", "0")
+
+    def addToWidgets(self, att, sub):
+        xmlref = [att, sub]
+        widgets.append(xmlref)
 
