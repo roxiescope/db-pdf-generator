@@ -13,14 +13,12 @@ from PyQt5.QtCore import Qt
 from file_browser import FileBrowser
 import generator
 import config_reader
-
-
-__version__ = '0.1'
-
+import rlog
 from Settings import MSettings
 import Settings
 
-ERROR_MSG = 'ERROR'
+
+__version__ = '0.1'
 
 
 class MaeveUI(QMainWindow):
@@ -29,7 +27,7 @@ class MaeveUI(QMainWindow):
         # Variables to track which windows are open
         self.settings_open = False
         self.Maeve_open = False
-
+        rlog.createlog()
         # Setting window color based on theme from settings
         self.setBaseSize(400, 300)
         self.setStyleSheet(Settings.get_theme('background_color'))
@@ -56,7 +54,7 @@ class MaeveUI(QMainWindow):
 
         self.warning = QMessageBox()
         self.warning.setStyleSheet(Settings.get_theme("background_color"))
-        self.warning.setText("Make sure the file(s) exist in the directory you want before closing. "
+        self.warning.setText("Make sure the file(s) exist in the directory you want before closing the app. "
                              "Depending on your settings the generator might take a while and "
                              "I don't have a progress bar yet love you")
 
@@ -110,7 +108,7 @@ class MaeveUI(QMainWindow):
 
     def settings_clicked(self):
         if self.settings_open:
-            print("Settings is already open")
+            rlog.writelog("You clicked Settings when it was already open")
         else:
             self.settings_dialog = MSettings()
             self.dialogs.append(self.settings_dialog)

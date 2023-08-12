@@ -1,6 +1,7 @@
 import sys
 import xml.etree.ElementTree as ET
 import glob
+import rlog
 
 '''
 1. getXML:
@@ -47,7 +48,7 @@ def getXML(attribute, subattribute=''):
                 for y in x.iter(subattribute):
                     return y.text
     else:
-        print("you need to make the xml")
+        rlog.writelog("RLGconfig.xml does not exist")
         # TODO: create xml with default values
 
 
@@ -63,7 +64,7 @@ def getXMLName(attribute, subattribute=''):
                 for y in x.iter(subattribute):
                     return y.get('name')
     else:
-        print("you need to make the xml")
+        rlog.writelog("RLGconfig.xml does not exist")
         # TODO: create xml with default values
 
 def setXML(attribute, value, subattribute=''):
@@ -78,7 +79,7 @@ def setXML(attribute, value, subattribute=''):
                 for y in x.iter(subattribute):
                     y.text = value
     else:
-        print("you need to make the xml")
+        rlog.writelog("RLGconfig.xml does not exist")
         # TODO: create xml with default values
     tree.write(mConfigLoc)
 
@@ -92,4 +93,4 @@ def getXMLChildren(attribute):
         # for x in root.find(attribute):
         #     return x.attrib
     else:
-        print("you need to make the xml")
+        rlog.writelog("RLGconfig.xml does not exist")

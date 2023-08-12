@@ -3,7 +3,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import Settings
 import config_reader
-
+import rlog
 import sys
 
 
@@ -39,26 +39,6 @@ class FileBrowser(QWidget):
         layout.addWidget(self.button)
         layout.addStretch()
 
-    # --------------------------------------------------------------------
-    # For example,
-    #    setMode(FileBrowser.OpenFile)
-    #    setMode(FileBrowser.OpenFiles)
-    #    setMode(FileBrowser.OpenDirectory)
-    #    setMode(FileBrowser.SaveFile)
-    def setMode(mode):
-        self.mode = mode
-
-    # --------------------------------------------------------------------
-    # For example,
-    #    setFileFilter('Images (*.png *.xpm *.jpg)')
-    def setFileFilter(text):
-        self.filter_name = text
-        # --------------------------------------------------------------------
-
-    def setDefaultDir(path):
-        self.dirpath = path
-
-    # --------------------------------------------------------------------
     def getFile(self):
         if self.browser_mode == FileBrowser.OpenFile:
             self.filepaths.append(QFileDialog.getOpenFileName(self, caption='Choose File',
@@ -81,14 +61,12 @@ class FileBrowser(QWidget):
                                                               options=options)[0])
         if len(self.filepaths) == 0:
             return
-        elif len(self.filepaths) == 1:
-            self.lineEdit.setText(self.filepaths[0])
         else:
-            self.lineEdit.setText(",".join(self.filepaths))
+            for x in range(len(self.filepaths)):
+                self.lineEdit.setText(self.filepaths[x])
+        # else:
+        #     self.lineEdit.setText(",".join(self.filepaths))
 
-
-    def setlineEditWidth(self, width):
-        self.lineEdit.setFixedWidth(width)
 
     def getPaths(self):
         return self.filepaths

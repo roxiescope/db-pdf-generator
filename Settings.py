@@ -5,7 +5,7 @@ import config_reader
 from PyQt5.QtWidgets import QMainWindow, QWidget, QLineEdit, QPushButton, \
     QCheckBox, QVBoxLayout, QLabel, QComboBox, QDesktopWidget, QFormLayout, QScrollArea
 from PyQt5 import QtCore
-import generator
+import generator, rlog
 from TagDialog import MTag
 
 # 2-d list telling me the XML attribute and sub-attribute for every widget created
@@ -95,7 +95,7 @@ def get_theme(attribute):
                           "QListWidget QScrollBar{background : #f7cac9;}" \
                           "QListView::item:selected{background: #abb1cf; color: black;}"
     else:
-        print("theme is fucked up")
+        rlog.writelog("Theme XML value is incorrect. Refer to the theme options shown in the Setttings GUI")
 
     if attribute == "background_color":
         return background_color
@@ -113,6 +113,7 @@ def get_theme(attribute):
         return unused_button_color
     else:
         print("theme attribute doesn't exist")
+        rlog.writelog("Developer note: theme attribute does not exist")
 
 
 class MSettings(QMainWindow):
@@ -224,7 +225,7 @@ class MSettings(QMainWindow):
         elif thm_value == "pastel":
             self.theme.setCurrentText("Pastel")
         else:
-            print("get_Everything invalid value for theme")
+            rlog.writelog("Theme XML value is incorrect. Refer to the theme options shown in the Settings GUI")
 
     def location_on_the_screen(self):
         self.move(600, 400)
@@ -245,7 +246,7 @@ class MSettings(QMainWindow):
         elif s == "Pastel":
             config_reader.setXML('theme', 'pastel')
         else:
-            print("invalid theme")
+            rlog.writelog("Developer note: theme input from user is invalid")
         self.theme_changed.emit()
 
     def setEverything(self):
@@ -255,7 +256,6 @@ class MSettings(QMainWindow):
                 if isinstance(w, QLineEdit):
                     y = widgets[x]
                     config_reader.setXML(str(y[0]), w.text(), str(y[1]))
-        # todo - refresh pages
         self.theme_changed.emit()
 
     def closeEvent(self, event):

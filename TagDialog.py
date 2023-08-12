@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QLineEdit, QPushButton, \
     QCheckBox, QVBoxLayout, QLabel, QComboBox, QDesktopWidget, QFormLayout
 from PyQt5 import QtCore
 import Settings
-import config_reader
+import config_reader, rlog
 import re
 
 

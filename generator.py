@@ -9,9 +9,9 @@ from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 import io
 from PIL import Image as Pimage
 import config_reader
-import os, sys, errno
+import rlog
 
-missing_image = './imagemissing.png'
+missing_image = 'Utilities/imagemissing.png'
 
 
 def setDocFormat(t, file='', path=''):
@@ -139,7 +139,10 @@ def addPageNumber(canvas, doc):
     try:
         canvas.drawInlineImage(config_reader.getXML('backImg'),0,0, width=8.5*inch,height=11*inch)
     except:
-        print("background image path is invalid")
+        if re.search("background image path is invalid", rlog.readlog()):
+            pass
+        else:
+            rlog.writelog("background image path is invalid")
     canvas.drawRightString(200*mm, 10*mm, text)
 
 def get_image(path, width=1*inch):
@@ -171,13 +174,11 @@ def orderPages(input):
             x[2] = re.search(r'\d+', temp_row).group()
             # if item has an order specified, add it to new_input
             new_input.append(x)
-            print(x[2])
             if re.search(first_string, temp_row):
                 temp_array = (x[0], x[2])
                 next_ord = x[2]
                 # newOrder will be the final list
                 newOrder.append(x)
-                print("I found the first item: " + str(temp_array))
         # unordered will store all the pages without an order specified
         unordered.append(x)
     for y in range(len(new_input)):
@@ -185,35 +186,11 @@ def orderPages(input):
             if z[0] == int(next_ord):
                 newOrder.append(z)
                 next_ord = z[2]
-                print("I found the next item: " + str(next_ord))
                 break
     # add the unordered pages back in
     for h in unordered:
         newOrder.append(h)
     return newOrder
-
-
-    # search for first page
-    # for row in input:
-    #     temp_row = str(row[1])
-    #     if re.search(first_string, temp_row):
-    #         newOrder.append(row)
-    #         next_ord = re.search(r'\d+', temp_row).group()
-    #     if re.search(search_string, temp_row):
-
-    # r = re.compile(next_ord)
-    # newList = list(filter(r.match, ids1d))
-    # print(str(newList))
-    # order everything else
-    # for row in ids:
-    #     temp_row = str(row[0])
-    #     if next_ord == temp_row:
-    #         print("id " + temp_row)
-    #         x = ids.index(row)
-    #         newOrder.append(input[x])
-    #         next_ord = re.search(r'\d+', order[x][0]).group()
-    #         print("points to " + next_ord)
-            # todo - how do I repeat this until I've gotten everything in the original list?
 
 
 def getTags():
@@ -243,7 +220,7 @@ def fetchData(type, path=''):
                                 password = config_reader.getXML('password'),
                                 port = config_reader.getXML('port'))
     except:
-        print("database credentials are incorrect")
+        rlog.writelog("Database credentials are incorrect")
         exit()
     # Establishing a database manipulator
     cur = conn.cursor()
@@ -274,7 +251,7 @@ def fetchData(type, path=''):
         cur.execute('SELECT "pageId","title" FROM public."pageTags" INNER JOIN tags ON "tagId" = tags."id";')
         return cur.fetchall()
     else:
-        print("database fetch unsuccessful")
+        rlog.writelog("Database fetch unsuccessful")
 
 
 def generateMarkdown(name, path, export):
@@ -302,7 +279,7 @@ def generateMarkdown(name, path, export):
         try:
             mdFile.create_md_file()
         except:
-            print("your markdown path probably doesn't exist")
+            rlog.writelog("Your markdown path probably doesn't exist")
     else:
         return newData
 
@@ -344,4 +321,4 @@ def generatePdf(name, path):
     try:
         doc.build(flowables, onFirstPage=addPageNumber, onLaterPages=addPageNumber)
     except:
-        print("your pdf path probably doesn't exist")
+        rlog.writelog("your pdf path probably doesn't exist")

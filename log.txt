@@ -1,0 +1,2 @@
+Starting new log file
+background image path is invalid
