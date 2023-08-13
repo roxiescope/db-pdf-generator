@@ -134,7 +134,7 @@ def addPageNumber(canvas, doc):
     Add the page number and the background image
     """
     page_num = canvas.getPageNumber()
-    text = "Page %s" % page_num
+    text = "%s" % page_num
     canvas.setFont("Times-Roman", 8)
     try:
         canvas.drawInlineImage(config_reader.getXML('backImg'),0,0, width=8.5*inch,height=11*inch)
@@ -167,6 +167,8 @@ def orderPages(input):
         a. iterate through input itself - for each row, if id (aka [0]) is next_ord, append [0] and [1] to newOrder
         b. set next_ord to [1]
     '''
+    # todo - now that this is before the tagging phase, probably need to combine all tags for one id into one space,
+    #  to get rid of duplicate entries
     for x in input:
         # print(x[0])
         temp_row = str(x[2])
@@ -197,21 +199,22 @@ def getTags():
     tags = fetchData("tags")
     return tags
 
-
 def removeTags(input):
     tagSettings = str(config_reader.getXML("tagsToInclude"))
     newIdList = []
     newData = []
+
     for x in input:
-        if re.search(x[1], tagSettings):
-            if x[0] not in newIdList:
-                newIdList.append(x[0])
-                newData.append(x)
+        for y in fetchData('tagMatrix',"",x[0]):
+            if re.search(str(y), tagSettings):
+                if x[0] not in newIdList:
+                    newIdList.append(x[0])
+                    newData.append(x)
 
     return newData
 
 
-def fetchData(type, path=''):
+def fetchData(type, path='', id = 0):
     # Establishing database connection
     try:
         conn = psycopg2.connect(database = config_reader.getXML('database'),
@@ -227,10 +230,8 @@ def fetchData(type, path=''):
     if type == 'content':
         # Pulling content from database
         # cur.execute('SELECT "id","content","render" FROM pages;')
-        cur.execute('SELECT pt."pageId", tags."title", pages."content", pages."render" '
-                    'FROM "pageTags" pt '
-                    'INNER JOIN "tags" ON pt."tagId" = tags."id" '
-                    'INNER JOIN pages ON pages."id" = pt."pageId";')
+        cur.execute('SELECT pages."id", pages."title", pages."content", pages."render" '
+                    'FROM pages ORDER BY pages."id" ASC;')
         return cur.fetchall()
     elif type == 'imageData':
         images = []
@@ -250,20 +251,20 @@ def fetchData(type, path=''):
     elif type == 'tags':
         cur.execute('SELECT "pageId","title" FROM public."pageTags" INNER JOIN tags ON "tagId" = tags."id";')
         return cur.fetchall()
+    elif type == 'tagMatrix':
+        cur.execute('SELECT "title" FROM public."pageTags" INNER JOIN tags ON "tagId" = tags."id" WHERE "pageId" = %s;', (id,))
+        return cur.fetchall()
     else:
         rlog.writelog("Database fetch unsuccessful")
-
 
 def generateMarkdown(name, path, export):
     mdFile = MdUtils(file_name=str(path + "/" + name))
     output = fetchData('content')
     taggedData = []
     # output is a 3-d array - 1st column is page id, 2nd is tags associated, 3rd is the markdown, 4th is the html
-    # Removing the paragraph symbols and their associated links
-    taggedData = removeTags(output)
     newData = []
-    # Remove linked paragraph signs
-    for row in taggedData:
+    # Removing the paragraph symbols and their associated links
+    for row in output:
         soup = BeautifulSoup(row[3], features="html5lib")
         for a in soup.findAll('a'):
             a.replaceWith("")
@@ -272,7 +273,8 @@ def generateMarkdown(name, path, export):
         newData.append(row)
 
     newData = orderPages(newData)
-    for x in newData:
+    taggedData = removeTags(newData)
+    for x in taggedData:
         mdFile.write(x[3])
     # Writing updated text to .md file, if user requests it
     if export:
@@ -281,7 +283,7 @@ def generateMarkdown(name, path, export):
         except:
             rlog.writelog("Your markdown path probably doesn't exist")
     else:
-        return newData
+        return taggedData
 
 
 def generatePdf(name, path):

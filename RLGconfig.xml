@@ -99,7 +99,7 @@
         <allowSplitting name="Allow Splitting:">1</allowSplitting>
     </PageSettings>
     <theme name="Name:">daredevil</theme>
-    <tagsToInclude name="Tags to Include:">['planet', 'tech', 'fantasy', 'timeline', 'event', 'intelligence', 'old god', 'universal', 'publication', 'magic', 'psionics', 'chi', 'soul', 'dimensions', 'reality', 'plant', 'race', 'rules', 'profession', 'class', 'weapon', 'gear', 'armor', 'monster', 'equipment']</tagsToInclude>
+    <tagsToInclude name="Tags to Include:">['planet', 'tech', 'fantasy', 'timeline', 'event', 'intelligence', 'old god']</tagsToInclude>
     <mdLastDirectory name="Markdown Directory:">C:/Users/stein/Documents/Github Projects/db-pdf-generator/temp</mdLastDirectory>
     <mdLastName name="Markdown Name:">seests</mdLastName>
     <mdLastSetting name="Generate Markdown:">2</mdLastSetting>
