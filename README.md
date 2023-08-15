@@ -1,4 +1,6 @@
 # db-pdf-generator
+To use the app, download everything in the "dist" folder and run the .exe file.
+
 To create executable for RLG, run:
 
 pip install -r requirements.txt (if you're not rox)
