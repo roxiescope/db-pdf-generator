@@ -8,14 +8,15 @@ Objective:
 
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, \
-    QVBoxLayout, QGridLayout, QLabel, QLineEdit, QFormLayout, QCheckBox, QMessageBox
+    QVBoxLayout, QGridLayout, QLabel, QLineEdit, QFormLayout, QCheckBox, QMessageBox, QProgressBar
 from PyQt5.QtCore import Qt
 from file_browser import FileBrowser
 import generator
 import config_reader
-import rlog
+import rlog, time
 from Settings import MSettings
 import Settings
+from generator import GeneratorGui
 
 
 __version__ = '0.1'
@@ -52,11 +53,11 @@ class MaeveUI(QMainWindow):
         self.pdfPath = FileBrowser(1, FileBrowser.OpenDirectory)
         self.pdfName = QLineEdit()
 
-        self.warning = QMessageBox()
-        self.warning.setStyleSheet(Settings.get_theme("background_color"))
-        self.warning.setText("Make sure the file(s) exist in the directory you want before closing the app. "
-                             "Depending on your settings the generator might take a while and "
-                             "I don't have a progress bar yet love you")
+        # self.warning = QMessageBox()
+        # self.warning.setStyleSheet(Settings.get_theme("background_color"))
+        # self.warning.setText("Make sure the file(s) exist in the directory you want before closing the app. "
+        #                      "Depending on your settings the generator might take a while and "
+        #                      "I don't have a progress bar yet love you")
 
         if config_reader.getXML('mdLastSetting') == '2':
             self.mdCheck.setChecked(True)
@@ -119,19 +120,36 @@ class MaeveUI(QMainWindow):
             self.settings_dialog.window_closed.connect(self.settings_closed)
 
     def generate_clicked(self):
-        x = self.warning.exec_()
+        # x = self.warning.exec_()
         m = ''
         p = ''
         for y in self.mdPath.getPaths():
             m = y
         for z in self.pdfPath.getPaths():
             p = z
-        if self.mdCheck.checkState() == 2:
-            generator.generateMarkdown(self.mdName.text(), m, True)
-            config_reader.setXML("mdLastDirectory", m)
-        if self.pdfCheck.checkState() == 2:
-            generator.generatePdf(self.pdfName.text(), p)
-            config_reader.setXML("pdfLastDirectory", m)
+        if self.mdCheck.checkState() == 2 and self.pdfCheck.checkState() == 2:
+            self.generator_dialog = GeneratorGui("b", self.mdName.text(), m, self.pdfName.text(), p)
+            # config_reader.setXML("mdLastDirectory", m)
+            # config_reader.setXML("mdLastName", self.mdName.text())
+            # config_reader.setXML("mdLastSetting", 2)
+            # config_reader.setXML("pdfLastDirectory", p)
+            # config_reader.setXML("pdfLastName", self.pdfName.text())
+            # config_reader.setXML("pdfLastSetting", 2)
+        elif self.mdCheck.checkState() == 2 and self.pdfCheck.checkState() == 0:
+            self.generator_dialog = GeneratorGui("m", self.mdName.text(), m, "d", "d")
+            # config_reader.setXML("mdLastDirectory", m)
+            # config_reader.setXML("mdLastName", self.mdName.text())
+            # config_reader.setXML("mdLastSetting", 2)
+        elif self.mdCheck.checkState() == 0 and self.pdfCheck.checkState() == 2:
+            self.generator_dialog = GeneratorGui("p", "d", "d", self.pdfName.text(), p)
+            # config_reader.setXML("pdfLastDirectory", p)
+            # config_reader.setXML("pdfLastName", self.pdfName.text())
+            # config_reader.setXML("pdfLastSetting", 2)
+        else:
+            rlog.writelog("No generation options selected")
+
+        self.dialogs.append(self.generator_dialog)
+        self.generator_dialog.show()
 
     def settings_closed(self):
         self.settings_open = False

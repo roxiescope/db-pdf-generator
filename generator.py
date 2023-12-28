@@ -1,15 +1,19 @@
 import re
+from lxml import etree
 import psycopg2
 from mdutils.mdutils import MdUtils
 from bs4 import BeautifulSoup
 from reportlab.lib.units import inch, mm
-from reportlab.lib import utils
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Image
+from reportlab.lib import utils, colors
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Image, TableStyle, Table
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 import io
 from PIL import Image as Pimage
 import config_reader
 import rlog
+import Settings
+from PyQt5.QtWidgets import QProgressBar, QMainWindow, QVBoxLayout, QWidget, QLabel, QApplication
+import sys
 
 missing_image = 'Utilities/imagemissing.png'
 
@@ -128,6 +132,18 @@ def setDocFormat(t, file='', path=''):
                                  borderPadding=float(config_reader.getXML('heading4', 'borderPadding')),
                                  )
         return h4Style
+    elif t == "table":
+        tStyle = TableStyle(
+            [('LINEABOVE', (0, 0), (-1, 0), 2, colors.black),
+             ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+             ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+             ('LINEBELOW', (0, -1), (-1, -1), 2, colors.black),
+             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+             ('NOSPLIT', (0, 0), (-1, -1))]
+        )
+        return tStyle
+
 
 def addPageNumber(canvas, doc):
     """
@@ -144,6 +160,7 @@ def addPageNumber(canvas, doc):
         else:
             rlog.writelog("background image path is invalid")
     canvas.drawRightString(200*mm, 10*mm, text)
+
 
 def get_image(path, width=1*inch):
     img = utils.ImageReader(path)
@@ -198,6 +215,7 @@ def orderPages(input):
 def getTags():
     tags = fetchData("tags")
     return tags
+
 
 def removeTags(input):
     tagSettings = str(config_reader.getXML("tagsToInclude"))
@@ -257,70 +275,132 @@ def fetchData(type, path='', id = 0):
     else:
         rlog.writelog("Database fetch unsuccessful")
 
-def generateMarkdown(name, path, export):
-    mdFile = MdUtils(file_name=str(path + "/" + name))
-    output = fetchData('content')
-    taggedData = []
-    # output is a 3-d array - 1st column is page id, 2nd is tags associated, 3rd is the markdown, 4th is the html
-    newData = []
-    # Removing the paragraph symbols and their associated links
-    for row in output:
-        soup = BeautifulSoup(row[3], features="html5lib")
-        for a in soup.findAll('a'):
-            a.replaceWith("")
-        row = list(row)
-        row[3] = str(soup).replace("¶", "")
-        newData.append(row)
 
-    newData = orderPages(newData)
-    taggedData = removeTags(newData)
-    for x in taggedData:
-        mdFile.write(x[3])
-    # Writing updated text to .md file, if user requests it
-    if export:
+class GeneratorGui(QMainWindow):
+    def __init__(self, option, m_name, m_path, p_name, p_path):
+        super().__init__()
+        # Variables to track which windows are open
+        rlog.createlog()
+        # Setting window color based on theme from settings
+        self.setBaseSize(200, 100)
+        self.setStyleSheet(Settings.get_theme('background_color'))
+        self.setWindowTitle('Generating...')
+        # Central widget and general layout of window
+        self.generalLayout = QVBoxLayout()
+        self._centralWidget = QWidget(self)
+        self.setCentralWidget(self._centralWidget)
+        self._centralWidget.setLayout(self.generalLayout)
+        self.label = QLabel("Starting Generation")
+        self.generalLayout.addWidget(self.label)
+        self.pbar = QProgressBar(self)
+        self.pbar.setGeometry(30, 40, 200, 25)
+        self.generalLayout.addWidget(self.pbar)
+        # List of windows created
+        if option == "m":
+            self.generateMarkdown(m_name, m_path, True)
+        elif option == "p":
+            self.generatePdf(p_name, p_path)
+        elif option == "b":
+            self.generateMarkdown(m_name, m_path, True)
+            self.generatePdf(p_name, p_path)
+
+    def generateMarkdown(self, name, path, export):
+        # self.label.setText("Creating Markdown")
+        self.pbar.setValue(0)
+        mdFile = MdUtils(file_name=str(path + "/" + name))
+        output = fetchData('content')
+        taggedData = []
+        # output is a 3-d array - 1st column is page id, 2nd is tags associated, 3rd is the markdown, 4th is the html
+        newData = []
+        # Removing the paragraph symbols and their associated links
+        for row in output:
+            soup = BeautifulSoup(row[3], features="html5lib")
+            for a in soup.findAll('a'):
+                a.replaceWith("")
+            row = list(row)
+            row[3] = str(soup).replace("¶", "")
+            newData.append(row)
+
+        newData = orderPages(newData)
+        taggedData = removeTags(newData)
+        total = len(taggedData)
+        a = 0
+        for x in taggedData:
+            mdFile.write(x[3])
+            i = int(a/total)
+            self.pbar.setValue(i * 100)
+            a += 1
+        # Writing updated text to .md file, if user requests it
+        if export:
+            try:
+                mdFile.create_md_file()
+            except:
+                rlog.writelog("Your markdown path probably doesn't exist")
+            # todo - exit out of progress gui
+        else:
+            return taggedData
+
+    def generatePdf(self, name, path):
+        # self.label.setText("Creating PDF")
+        self.pbar.setValue(0)
+        flowables = []
+        finalData = self.generateMarkdown(name, path, False)
+        images = fetchData('imageData', path)
+        doc = setDocFormat("page", name, path)
+        total = len(finalData)
+        x = 0
+        for row in finalData:
+            soup = BeautifulSoup(row[3], features="html5lib")
+            for a in soup.findAll(True):
+                if a.name == 'h1':
+                    para = Paragraph(str(a), style=setDocFormat('h1'))
+                    flowables.append(para)
+                if a.name == 'li':
+                    item = '<bullet>&bull</bullet>' + str(a)
+                    para = Paragraph(item, style=setDocFormat('bullet'))
+                    flowables.append(para)
+                if a.name == 'h2':
+                    item = '<u>' + str(a) + '</u>'
+                    para = Paragraph(item, style=setDocFormat('h2'))
+                    flowables.append(para)
+                if a.name == 'p':
+                    for child in a.findChildren('img', recursive=False):
+                        source = child.get('alt')
+                        for x in images:
+                            if str(source) == str(x):
+                                flowables.append(get_image(source, width=6 * inch))
+                        child.replaceWith('')
+                    para = Paragraph(str(a), style=setDocFormat('text'))
+                    flowables.append(para)
+                if a.name == 'h3':
+                    para = Paragraph(str(a), style=setDocFormat('h3'))
+                    flowables.append(para)
+                if a.name == 'h4':
+                    para = Paragraph(str(a), style=setDocFormat('h4'))
+                    flowables.append(para)
+                if a.name == 'table':
+                    item = 'THIS IS A TABLE ' + str(a)
+                    data = []
+                    newData = []
+                    rows = a.find_all('tr')
+                    for row in rows:
+                        head = row.find_all('th')
+                        head = [x.text.strip() for x in head]
+                        data.append([y for y in head if y])
+                        cols = row.find_all('td')
+                        cols = [ele.text.strip() for ele in cols]
+                        data.append([ele for ele in cols if ele])
+                    for z in data:
+                        if z:
+                            newData.append(z)
+                    para = Table(newData, style=setDocFormat('table'))
+                    flowables.append(para)
+            i = int(x / total)
+            self.pbar.setValue(i * 100)
+            x += 1
+
         try:
-            mdFile.create_md_file()
+            doc.build(flowables, onFirstPage=addPageNumber, onLaterPages=addPageNumber)
         except:
-            rlog.writelog("Your markdown path probably doesn't exist")
-    else:
-        return taggedData
-
-
-def generatePdf(name, path):
-    flowables = []
-    finalData = generateMarkdown(name, path, False)
-    images = fetchData('imageData', path)
-    doc = setDocFormat("page", name, path)
-    for row in finalData:
-        soup = BeautifulSoup(row[3], features="html5lib")
-        for a in soup.findAll(True):
-            if a.name == 'h1':
-                para = Paragraph(str(a), style=setDocFormat('h1'))
-                flowables.append(para)
-            if a.name == 'li':
-                item = '<bullet>&bull</bullet>' + str(a)
-                para = Paragraph(item, style=setDocFormat('bullet'))
-                flowables.append(para)
-            if a.name == 'h2':
-                item = '<u>' + str(a) + '</u>'
-                para = Paragraph(item, style=setDocFormat('h2'))
-                flowables.append(para)
-            if a.name == 'p':
-                for child in a.findChildren('img', recursive=False):
-                    source = child.get('alt')
-                    for x in images:
-                        if str(source) == str(x):
-                            flowables.append(get_image(source, width=6 * inch))
-                    child.replaceWith('')
-                para = Paragraph(str(a), style=setDocFormat('text'))
-                flowables.append(para)
-            if a.name == 'h3':
-                para = Paragraph(str(a), style=setDocFormat('h3'))
-                flowables.append(para)
-            if a.name == 'h4':
-                para = Paragraph(str(a), style=setDocFormat('h4'))
-                flowables.append(para)
-    try:
-        doc.build(flowables, onFirstPage=addPageNumber, onLaterPages=addPageNumber)
-    except:
-        rlog.writelog("your pdf path probably doesn't exist")
+            rlog.writelog("your pdf path probably doesn't exist")
+        # todo - exit out of progress gui
