@@ -139,8 +139,7 @@ def setDocFormat(t, file='', path=''):
              ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
              ('LINEBELOW', (0, -1), (-1, -1), 2, colors.black),
              ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-             ('NOSPLIT', (0, 0), (-1, -1))]
+             ('VALIGN', (0, 0), (-1, -1), 'TOP')]
         )
         return tStyle
 
@@ -292,9 +291,9 @@ class GeneratorGui(QMainWindow):
         self._centralWidget.setLayout(self.generalLayout)
         self.label = QLabel("Starting Generation")
         self.generalLayout.addWidget(self.label)
-        self.pbar = QProgressBar(self)
-        self.pbar.setGeometry(30, 40, 200, 25)
-        self.generalLayout.addWidget(self.pbar)
+        # self.pbar = QProgressBar(self)
+        # self.pbar.setGeometry(30, 40, 200, 25)
+        # self.generalLayout.addWidget(self.pbar)
         # List of windows created
         if option == "m":
             self.generateMarkdown(m_name, m_path, True)
@@ -306,7 +305,7 @@ class GeneratorGui(QMainWindow):
 
     def generateMarkdown(self, name, path, export):
         # self.label.setText("Creating Markdown")
-        self.pbar.setValue(0)
+        # self.pbar.setValue(0)
         mdFile = MdUtils(file_name=str(path + "/" + name))
         output = fetchData('content')
         taggedData = []
@@ -327,9 +326,9 @@ class GeneratorGui(QMainWindow):
         a = 0
         for x in taggedData:
             mdFile.write(x[3])
-            i = int(a/total)
-            self.pbar.setValue(i * 100)
-            a += 1
+            # i = int(a/total)
+            # self.pbar.setValue(i * 100)
+            # a += 1
         # Writing updated text to .md file, if user requests it
         if export:
             try:
@@ -342,7 +341,8 @@ class GeneratorGui(QMainWindow):
 
     def generatePdf(self, name, path):
         # self.label.setText("Creating PDF")
-        self.pbar.setValue(0)
+        # self.pbar.setValue(0)
+        unique_tags = []
         flowables = []
         finalData = self.generateMarkdown(name, path, False)
         images = fetchData('imageData', path)
@@ -352,6 +352,8 @@ class GeneratorGui(QMainWindow):
         for row in finalData:
             soup = BeautifulSoup(row[3], features="html5lib")
             for a in soup.findAll(True):
+                if a.name not in unique_tags:
+                    unique_tags.append(a.name)
                 if a.name == 'h1':
                     para = Paragraph(str(a), style=setDocFormat('h1'))
                     flowables.append(para)
@@ -392,15 +394,30 @@ class GeneratorGui(QMainWindow):
                         data.append([ele for ele in cols if ele])
                     for z in data:
                         if z:
+                            for y in range(len(z)):
+                                if len(z[y]) > 70:
+                                    z[y] = self._chopline(str(z[y]), 70)
                             newData.append(z)
-                    para = Table(newData, style=setDocFormat('table'))
+                    para = Table(newData, style=setDocFormat('table'), colWidths=None)
                     flowables.append(para)
-            i = int(x / total)
-            self.pbar.setValue(i * 100)
-            x += 1
+            # i = int(x / total)
+            # self.pbar.setValue(i * 100)
+            # x += 1
 
         try:
             doc.build(flowables, onFirstPage=addPageNumber, onLaterPages=addPageNumber)
         except:
             rlog.writelog("your pdf path probably doesn't exist")
+        print(unique_tags)
         # todo - exit out of progress gui
+
+    def _chopline(self, line, maxline):
+        cant = len(line) / maxline
+        cant += 1
+        strline = ""
+        index = maxline
+        for i in range(1, int(cant)):
+            index = maxline * i
+            strline += "%s\n" % (line[(index - maxline):index])
+        strline += "%s\n" % (line[index:])
+        return strline
